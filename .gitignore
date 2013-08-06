@@ -7,3 +7,5 @@ include/
 config_mailgun.py
 data/
 temp/
+
+TODO.md
