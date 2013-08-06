@@ -34,7 +34,8 @@ with open(DATAFILE, 'r') as f:
 
         fig = plt.figure()
         plt.bar(xlocations, barheights, barwidth, bottom)
-        plt.title(graph['name'] + ' ' + graph['additional'])
+        plt.suptitle(graph['name'], fontsize=14)
+        plt.title(graph['additional'], fontsize=10)
         plt.xlabel("Times Logged In")
         plt.ylabel("People")
 
