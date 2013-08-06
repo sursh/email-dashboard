@@ -6,8 +6,8 @@ import json
 import string
 import os
 
-DEBUG = False
-DATAFILE = 'data/old_but_good.json'
+DEBUG = True
+DATAFILE = 'data/new.json'
 BINS = 10
 
 with open(DATAFILE, 'r') as f:
@@ -15,7 +15,7 @@ with open(DATAFILE, 'r') as f:
     wholefile = json.loads(wholefile)
     # wholefile is now a list, each element being a dict for one graph
 
-    # set up folder for pics
+    # set up folder for pngs
     try:
         os.chdir('temp')
     except:
@@ -25,7 +25,17 @@ with open(DATAFILE, 'r') as f:
     for graph in wholefile:
 
         if DEBUG: print "Starting with this graph: \n", graph, '\n'
-        barheights = [int(y) for y in graph['data'].split(',')]
+
+        d = graph['data']
+        # cast the keys from strings to ints
+        for key in d.keys():
+            d[int(key)] = d[key]
+            del(d[key])
+
+        # store dict's values in array for graphing
+        barheights = []
+        for i in range(1, max(d.keys())+1):
+            barheights.append(d.get(i, 0))
         barheights = barheights[:BINS]
 
         bottom = 0
@@ -39,16 +49,14 @@ with open(DATAFILE, 'r') as f:
             barwidth,
             bottom,
             color=(.4,.4,.4),
-            linewidth=0
+            linewidth=0,
         )
+
+        # graph labels
         plt.suptitle(graph['name'], fontsize=14)
         plt.title(graph['additional'], fontsize=10)
-        plt.xlabel("Times Logged In")
-        plt.ylabel("People")
-
-        exclude = set(string.punctuation)
-        filename = ''.join(char for char in graph['name'] + graph['additional'] if char not in exclude).replace(' ', '')
-        filename = filename + ".png"
+        plt.xlabel(graph['xlabel'])
+        plt.ylabel(graph['ylabel'])
 
         # remove right&top axes&ticks
         ax = fig.gca()
@@ -59,6 +67,7 @@ with open(DATAFILE, 'r') as f:
         # this may be a more robust solution:
         # http://matplotlib.org/faq/howto_faq.html#automatically-make-room-for-tick-labels
         fig.set_size_inches(6,4.5)
+        filename = graph['uniquename'] + '.png'
         plt.savefig(filename, dpi=80)
         if DEBUG: print "Created file %s" % filename
 
