@@ -9,18 +9,19 @@
 
 '''
 
+import sys
 import os
 import requests
 import json
 from werkzeug import MultiDict as MultiDict
 from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO
-from config import DATAFILE, IMAGEDIR
+from config import IMAGEDIR
 
-DEBUG = True
+DEBUG = False
 POST_URL = 'https://api.mailgun.net/v2/refugeesunited.mailgun.org/messages'
 
-def send_email():
-    with open(DATAFILE, 'r') as f:
+def send_email(datafile):
+    with open(datafile, 'r') as f:
         wholefile = f.read()
         wholefile = json.loads(wholefile)
 
@@ -62,5 +63,11 @@ def send_email():
 
 if __name__ == '__main__':
 
-    r = send_email()
+    if len(sys.argv) != 2:
+        print 'Usage: $ %s <inputFile>' % sys.argv[0]
+        sys.exit(1)
+
+    datafile = sys.argv[1]
+
+    r = send_email(datafile)
     print r.text
