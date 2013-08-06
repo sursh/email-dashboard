@@ -1,0 +1,9 @@
+.DS_Store
+*.pyc
+bin/
+lib/
+include/
+.Python
+credentials.py
+data/
+temp/

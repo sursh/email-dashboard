@@ -1,0 +1,13 @@
+Flask==0.10.1
+Jinja2==2.7
+MarkupSafe==0.18
+Werkzeug==0.9.1
+cssmin==0.1.4
+envoy==0.0.2
+itsdangerous==0.21
+matplotlib==1.2.1
+numpy==1.7.1
+ply==3.4
+requests==1.2.3
+slimit==0.8.1
+wsgiref==0.1.2
