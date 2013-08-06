@@ -5,22 +5,21 @@ import matplotlib.pyplot as plt
 import json
 import string
 import os
+from config import IMAGEDIR, DATAFILE
 
 DEBUG = True
-DATAFILE = 'data/new.json'
 BINS = 10
 
 with open(DATAFILE, 'r') as f:
     wholefile = f.read()
     wholefile = json.loads(wholefile)
-    # wholefile is now a list, each element being a dict for one graph
 
     # set up folder for pngs
     try:
-        os.chdir('temp')
+        os.chdir(IMAGEDIR)
     except:
-        os.mkdir('temp')
-        os.chdir('temp')
+        os.mkdir(IMAGEDIR)
+        os.chdir(IMAGEDIR)
 
     for graph in wholefile:
 

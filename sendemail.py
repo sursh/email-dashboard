@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 '''
-    Sends an email with all the images in PICDIR displayed inline. Uses the
+    Sends an email with all the images in IMAGEDIR displayed inline. Uses the
     Mailgun API for testing.
 
     To adjust recipients of this email, configure the 'dailyreports'
@@ -14,16 +14,14 @@ import requests
 import json
 from werkzeug import MultiDict as MultiDict
 from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO
+from config import DATAFILE, IMAGEDIR
 
 POST_URL = 'https://api.mailgun.net/v2/refugeesunited.mailgun.org/messages'
-DATAFILE = 'data/new.json'
-PICDIR = 'temp'
 
 def send_email():
     with open(DATAFILE, 'r') as f:
         wholefile = f.read()
         wholefile = json.loads(wholefile)
-        # wholefile is now a list, each element being a dict for one graph
 
         files = MultiDict()
         html = ['<html>']
@@ -37,7 +35,7 @@ def send_email():
                 pass
             elif graph['type'] == 'bar' and graph['data']:
                 imagename = graph['uniquename'] + '.png'
-                files.add('inline[' + str(i) + ']', open(os.path.join(PICDIR, imagename)))
+                files.add('inline[' + str(i) + ']', open(os.path.join(IMAGEDIR, imagename)))
                 i += 1
                 html.append('<p>%s %s</p> <p><img src="cid:%s" alt="%s"></p>' % (graph['name'].title(), graph['additional'].title(), imagename, graph['name']+' graph'))
 
