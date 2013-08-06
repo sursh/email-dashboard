@@ -26,7 +26,7 @@ def send_inline_image(imagelist):
     # https://github.com/kennethreitz/requests/issues/1155
     for image in imagelist:
         files.add('inline[' + str(i) + ']', open(os.path.join(PICDIR, image)))
-        html.append('<p>Inline image here: <img src="cid:' + image + '"></p>')
+        html.append('<p>Inline image here: <img src="cid:%s" alt="%s"></p>' % (image, image)) #TODO make this alt text more readable
         i += 1
     html.append('</html>')
 
