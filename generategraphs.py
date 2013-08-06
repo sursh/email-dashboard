@@ -7,7 +7,7 @@ import string
 import os
 
 DEBUG = False
-DATAFILE = '../data/old_but_good.json'
+DATAFILE = 'data/old_but_good.json'
 BINS = 10
 
 with open(DATAFILE, 'r') as f:
@@ -16,7 +16,11 @@ with open(DATAFILE, 'r') as f:
     # wholefile is now a list, each element being a dict for one graph
 
     # set up folder for pics
-    os.mkdir('temp')
+    try:
+        os.chdir('temp')
+    except:
+        os.mkdir('temp')
+        os.chdir('temp')
 
     for graph in wholefile:
 
@@ -28,6 +32,7 @@ with open(DATAFILE, 'r') as f:
         barwidth = 1
         xlocations = np.arange(len(barheights))
 
+        fig = plt.figure()
         plt.bar(xlocations, barheights, barwidth, bottom)
         plt.title(graph['name'] + ' ' + graph['additional'])
         plt.xlabel("Times Logged In")
@@ -36,7 +41,13 @@ with open(DATAFILE, 'r') as f:
         exclude = set(string.punctuation)
         filename = ''.join(char for char in graph['name'] + graph['additional'] if char not in exclude).replace(' ', '')
         filename = filename + ".png"
-        plt.savefig(filename)
+
+        # print "THE DPI IS ", fig.get_dpi()
+
+        # fig.set_size_inches(2.4,2)
+        # plt.savefig(filename, dpi=200)
+        fig.set_size_inches(6,4.5)
+        plt.savefig(filename, dpi=80)
         if DEBUG: print "Created file %s" % filename
 
         plt.clf()
