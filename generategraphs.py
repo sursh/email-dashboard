@@ -43,10 +43,8 @@ with open(DATAFILE, 'r') as f:
         filename = ''.join(char for char in graph['name'] + graph['additional'] if char not in exclude).replace(' ', '')
         filename = filename + ".png"
 
-        # print "THE DPI IS ", fig.get_dpi()
-
-        # fig.set_size_inches(2.4,2)
-        # plt.savefig(filename, dpi=200)
+        # this may be a more robust solution:
+        # http://matplotlib.org/faq/howto_faq.html#automatically-make-room-for-tick-labels
         fig.set_size_inches(6,4.5)
         plt.savefig(filename, dpi=80)
         if DEBUG: print "Created file %s" % filename
