@@ -43,6 +43,12 @@ with open(DATAFILE, 'r') as f:
         filename = ''.join(char for char in graph['name'] + graph['additional'] if char not in exclude).replace(' ', '')
         filename = filename + ".png"
 
+        # remove right&top axes&ticks
+        ax = fig.gca()
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.tick_params(top=False, right=False)
+
         # this may be a more robust solution:
         # http://matplotlib.org/faq/howto_faq.html#automatically-make-room-for-tick-labels
         fig.set_size_inches(6,4.5)
