@@ -24,51 +24,59 @@ with open(DATAFILE, 'r') as f:
 
     for graph in wholefile:
 
-        if DEBUG: print "Starting with this graph: \n", graph, '\n'
+        if graph['type'] == 'bar' and graph['data']:
 
-        d = graph['data']
-        # cast the keys from strings to ints
-        for key in d.keys():
-            d[int(key)] = d[key]
-            del(d[key])
+            if DEBUG: print "STARTING WITH %s" % graph['uniquename']
 
-        # store dict's values in array for graphing
-        barheights = []
-        for i in range(1, max(d.keys())+1):
-            barheights.append(d.get(i, 0))
-        barheights = barheights[:BINS]
+            d = graph['data']
+            # cast the keys from strings to ints
+            for key in d.keys():
+                d[int(key)] = d[key]
+                del(d[key])
 
-        bottom = 0
-        barwidth = 1
-        xlocations = np.arange(len(barheights))
+            # store dict's values in array for graphing
+            barheights = []
+            for i in range(1, max(d.keys())+1):
+                barheights.append(d.get(i, 0))
+            barheights = barheights[:BINS]
 
-        fig = plt.figure()
-        plt.bar(
-            xlocations,
-            barheights,
-            barwidth,
-            bottom,
-            color=(.4,.4,.4),
-            linewidth=0,
-        )
+            bottom = 0
+            barwidth = 1
+            xlocations = np.arange(len(barheights))
 
-        # graph labels
-        plt.suptitle(graph['name'], fontsize=14)
-        plt.title(graph['additional'], fontsize=10)
-        plt.xlabel(graph['xlabel'])
-        plt.ylabel(graph['ylabel'])
+            fig = plt.figure()
+            plt.bar(
+                xlocations,
+                barheights,
+                barwidth,
+                bottom,
+                color=(.4,.4,.4),
+                linewidth=0,
+            )
 
-        # remove right&top axes&ticks
-        ax = fig.gca()
-        ax.spines['right'].set_visible(False)
-        ax.spines['top'].set_visible(False)
-        ax.tick_params(top=False, right=False)
+            # graph labels
+            plt.suptitle(graph['name'], fontsize=14)
+            plt.title(graph['additional'], fontsize=10)
+            plt.xlabel(graph['xlabel'])
+            plt.ylabel(graph['ylabel'])
 
-        # this may be a more robust solution:
-        # http://matplotlib.org/faq/howto_faq.html#automatically-make-room-for-tick-labels
-        fig.set_size_inches(6,4.5)
-        filename = graph['uniquename'] + '.png'
-        plt.savefig(filename, dpi=80)
-        if DEBUG: print "Created file %s" % filename
+            # remove right&top axes&ticks
+            ax = fig.gca()
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+            ax.tick_params(top=False, right=False)
 
-        plt.clf()
+            # this may be a more robust solution:
+            # http://matplotlib.org/faq/howto_faq.html#automatically-make-room-for-tick-labels
+            fig.set_size_inches(6,4.5)
+            filename = graph['uniquename'] + '.png'
+            plt.savefig(filename, dpi=80)
+            if DEBUG: print "SUCCESS! Created file %s" % filename
+
+            plt.clf()
+
+        else:
+
+            print 'Did NOT create graph for %s' % graph['uniquename']
+            if not graph['data']: print 'because didn\'t contain any data'
+            if graph['type'] != 'bar': print 'because type: %s' % graph['type']
