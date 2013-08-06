@@ -16,6 +16,7 @@ from werkzeug import MultiDict as MultiDict
 from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO
 from config import DATAFILE, IMAGEDIR
 
+DEBUG = True
 POST_URL = 'https://api.mailgun.net/v2/refugeesunited.mailgun.org/messages'
 
 def send_email():
@@ -24,22 +25,29 @@ def send_email():
         wholefile = json.loads(wholefile)
 
         files = MultiDict()
-        html = ['<html>']
+        html = ['<html>\n']
         # this 'i' business is jank to work around a Multidict bug in Requests:
         # https://github.com/kennethreitz/requests/issues/1155
         i = 1
         for graph in wholefile:
             if graph['type'] == 'table':
-                pass
+                html.append('<h3>%s %s</h3>' % (graph['name'], graph['additional']))
+                html.append('<table cellspacing="10" text-align="center">\n')
+                html.append('<th>%s</th><th>%s</th>\n' % (graph['columns'][0], graph['columns'][1]))
+                for row in graph['data']:
+                    html.append('<tr><td>%s</td><td>%s</td></tr>\n' % (row[0], row[1]))
+                html.append('</table>')
             elif graph['type'] == 'timeseries':
                 pass
             elif graph['type'] == 'bar' and graph['data']:
                 imagename = graph['uniquename'] + '.png'
                 files.add('inline[' + str(i) + ']', open(os.path.join(IMAGEDIR, imagename)))
                 i += 1
-                html.append('<p>%s %s</p> <p><img src="cid:%s" alt="%s"></p>' % (graph['name'].title(), graph['additional'].title(), imagename, graph['name']+' graph'))
+                html.append('<h3>%s %s</h3> <p><img src="cid:%s" alt="%s"></p>\n' % (graph['name'].title(), graph['additional'].title(), imagename, graph['name']+' graph'))
 
         html.append('</html>')
+
+        if DEBUG: print ''.join(html)
 
     return requests.post(
         POST_URL,
