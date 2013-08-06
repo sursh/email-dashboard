@@ -12,7 +12,7 @@
 import os
 import requests
 from werkzeug import MultiDict as MultiDict
-from credentials import MAILGUN_KEY
+from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO
 
 POST_URL = 'https://api.mailgun.net/v2/refugeesunited.mailgun.org/messages'
 
@@ -34,8 +34,8 @@ def send_inline_image(imagelist):
         POST_URL,
         auth=('api', MAILGUN_KEY),
         files=files,
-        data={"from": "Refugees United <me@refugeesunited.mailgun.org>",
-              "to": "dailyreports@refugeesunited.mailgun.org",
+        data={"from": MAILGUN_FROM,
+              "to": MAILGUN_TO,
               "subject": "Daily Status Report",
               "text": "Daily snapshot of the Refugees United dashboard.",
               "html": ''.join(html),

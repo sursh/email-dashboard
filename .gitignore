@@ -4,6 +4,6 @@ bin/
 lib/
 include/
 .Python
-credentials.py
+config_mailgun.py
 data/
 temp/
