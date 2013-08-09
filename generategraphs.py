@@ -6,6 +6,7 @@ import json
 import string
 import os
 import sys
+from datetime import datetime
 from config import IMAGEDIR
 
 DEBUG = False
@@ -26,8 +27,6 @@ def generate_graphs(datafile):
         for graph in wholefile:
 
             if graph['type'] == 'bar' and graph['data']:
-
-                if DEBUG: print "STARTING WITH %s" % graph['uniquename']
 
                 d = graph['data']
                 # cast the keys from strings to ints
@@ -56,8 +55,8 @@ def generate_graphs(datafile):
                 )
 
                 # graph labels
-                plt.suptitle(graph['name'], fontsize=14)
-                plt.title(graph['additional'], fontsize=10)
+                plt.suptitle(graph.get('name', ''), fontsize=14)
+                plt.title(graph.get('additional', ''), fontsize=10)
                 plt.xlabel(graph['xlabel'])
                 plt.ylabel(graph['ylabel'])
 
@@ -76,11 +75,33 @@ def generate_graphs(datafile):
 
                 plt.clf()
 
+            elif graph['type'] == 'timeseries' and graph['data']:
+                d = graph['data']
+
+                fig = plt.figure()
+                x = [datetime.strptime(key, "%Y-%m-%d") for key in sorted(d.keys())]
+                y = [d[key] for key in sorted(d.keys())]
+                plt.plot(x, y, 'o-')
+                fig.autofmt_xdate()
+
+                # labels
+                plt.suptitle(graph.get('name', ''), fontsize=14)
+                plt.title(graph.get('additional', ''), fontsize=10)
+                plt.ylabel(graph['ylabel'])
+
+                # save and resize image file
+                fig.set_size_inches(6,4.5)
+                filename = graph['uniquename'] + '.png'
+                plt.savefig(filename, dpi=80)
+                if DEBUG: print "SUCCESS! Created file %s" % filename
+
+                plt.clf()
+
             else:
                 if DEBUG:
-                    print 'Did NOT create graph for %s' % graph['uniquename']
-                    if not graph['data']: print 'because didn\'t contain any data'
-                    if graph['type'] != 'bar': print 'because type: %s' % graph['type']
+                    print 'Did NOT create graph for "%s" (type: %s)' % (graph['uniquename'], graph['type'])
+                    if not graph['data']: print '\tbecause it didn\'t contain any data'
+                    else: print '\t because it\'s not a supported graph type'
 
 if __name__ == '__main__':
 
