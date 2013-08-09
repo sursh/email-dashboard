@@ -31,6 +31,7 @@ def send_email(datafile):
         # https://github.com/kennethreitz/requests/issues/1155
         i = 1
         for graph in wholefile:
+
             if graph['type'] == 'table':
                 html.append('<h3>%s %s</h3>' % (graph['name'], graph['additional']))
                 html.append('<table cellspacing="10" text-align="center">\n')
@@ -38,13 +39,12 @@ def send_email(datafile):
                 for row in graph['data']:
                     html.append('<tr><td>%s</td><td>%s</td></tr>\n' % (row[0], row[1]))
                 html.append('</table>')
-            elif graph['type'] == 'timeseries':
-                pass
-            elif graph['type'] == 'bar' and graph['data']:
+
+            elif graph['type'] == 'timeseries' or (graph['type'] == 'bar' and graph['data']):
                 imagename = graph['uniquename'] + '.png'
                 files.add('inline[' + str(i) + ']', open(os.path.join(IMAGEDIR, imagename)))
                 i += 1
-                html.append('<h3>%s %s</h3> <p><img src="cid:%s" alt="%s"></p>\n' % (graph['name'].title(), graph['additional'].title(), imagename, graph['name']+' graph'))
+                html.append('<h3>%s %s</h3> <p><img src="cid:%s" alt="%s"></p>\n' % (graph['name'].title(), graph.get('additional', '').title(), imagename, graph['name']+' graph'))
 
         html.append('</html>')
 
