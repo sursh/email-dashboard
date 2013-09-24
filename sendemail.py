@@ -56,7 +56,7 @@ def send_email(datafile):
         files=files,
         data={"from": MAILGUN_FROM,
               "to": MAILGUN_TO,
-              "subject": "Daily Status Report yeahhhh",
+              "subject": "Daily Status Report",
               "text": "Daily snapshot of the Refugees United dashboard.",
               "html": ''.join(html),
               })
