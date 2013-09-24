@@ -6,11 +6,14 @@ import json
 import string
 import os
 import sys
+import logging
 from datetime import datetime
 from config import IMAGEDIR
 
 DEBUG = False
 BINS = 10
+
+logging.basicConfig(level=logging.INFO)
 
 def generate_graphs(datafile):
     with open(datafile, 'r') as f:
@@ -25,6 +28,8 @@ def generate_graphs(datafile):
             os.chdir(IMAGEDIR)
 
         for graph in wholefile:
+
+            logging.info("Graphing %s." % graph['uniquename'])
 
             if graph['type'] == 'bar' and graph['data']:
 
