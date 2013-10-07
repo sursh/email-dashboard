@@ -17,7 +17,7 @@ def generate_graphs(datafile):
     with open(datafile, 'r') as f:
         wholefile = f.read()
         wholefile = json.loads(wholefile)
-
+        
         # set up folder for pngs
         try:
             os.chdir(IMAGEDIR)
@@ -33,9 +33,7 @@ def generate_graphs(datafile):
 
                 d = graph['data']
                 # cast the keys from strings to ints
-                for key in d.keys():
-                    d[int(key)] = d[key]
-                    del(d[key])
+                d = { int(k):d[k] for k in d.keys() }
 
                 # store dict's values in array for graphing
                 barheights = []
