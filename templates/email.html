@@ -1,0 +1,20 @@
+<html>
+
+  {% for graph in context %}
+
+    <h3>{{ graph.title }} {{ graph.additional }}</h3>
+    
+    {% if graph.type == 'imagegraph' %}
+      <p><img src="cid:{{ graph.cid }}" alt="{{ graph.alt }}" /></p>
+      
+    {% elif graph.type == 'table' %}    
+      <table cellspacing="10" text-align="center">
+        <th>{{ graph.col1 }}</th><th>{{ graph.col2 }}</th>
+        {% for p1, p2 in graph.points %}
+          <tr><td>{{ p1 }}</td><td>{{ p2 }}</td></tr>
+        {% endfor %} 
+      </table>
+    {% endif %}
+  {% endfor %}
+
+</html>

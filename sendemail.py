@@ -16,50 +16,67 @@ import json
 from werkzeug import MultiDict as MultiDict
 from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO
 from config import IMAGEDIR
+from jinja2 import Environment, PackageLoader
 
 DEBUG = False
 POST_URL = 'https://api.mailgun.net/v2/refugeesunited.mailgun.org/messages'
 
 def send_email(datafile):
+  
+    env = Environment(loader=PackageLoader('sendemail', 'templates'))
+    template = env.get_template('email.html')
+    
     with open(datafile, 'r') as f:
         wholefile = f.read()
         wholefile = json.loads(wholefile)
 
         files = MultiDict()
-        html = ['<html>\n']
         # this 'i' business is jank to work around a Multidict bug in Requests:
         # https://github.com/kennethreitz/requests/issues/1155
         i = 1
+
+        context = list()
+        
         for graph in wholefile:
-
+            points = list()
+            
             if graph['type'] == 'table':
-                html.append('<h3>%s %s</h3>' % (graph['name'], graph['additional']))
-                html.append('<table cellspacing="10" text-align="center">\n')
-                html.append('<th>%s</th><th>%s</th>\n' % (graph['columns'][0], graph['columns'][1]))
                 for row in graph['data']:
-                    html.append('<tr><td>%s</td><td>%s</td></tr>\n' % (row[0], row[1]))
-                html.append('</table>')
-
+                    points.append((row[0], row[1]))
+                
+                currentgraph = { 
+                                    'type' : 'table',
+                                    'title' : graph['name'].title(), 
+                                    'additional' : graph['additional'].title(), 
+                                    'col1' : graph['columns'][0],
+                                    'col2' : graph['columns'][1],
+                                    'points' : points,
+                                }
+                
             elif graph['type'] == 'timeseries' or (graph['type'] == 'bar' and graph['data']):
                 imagename = graph['uniquename'] + '.png'
-                files.add('inline[' + str(i) + ']', open(os.path.join(IMAGEDIR, imagename)))
+                files.add('inline[%s]' % str(i), open(os.path.join(IMAGEDIR, imagename)))
                 i += 1
-                html.append('<h3>%s %s</h3> <p><img src="cid:%s" alt="%s"></p>\n' % (graph['name'].title(), graph.get('additional', '').title(), imagename, graph['name']+' graph'))
-
-        html.append('</html>')
-
-        if DEBUG: print ''.join(html)
-
+                currentgraph = {
+                                    'type' : 'imagegraph',
+                                    'title' : graph['name'].title(),
+                                    'additional' : graph.get('additional', '').title(),
+                                    'cid' : imagename,
+                                    'alt' : '%s graph' % graph['name'],
+                                    }
+            
+            context.append(currentgraph)
+        
     return requests.post(
-        POST_URL,
-        auth=('api', MAILGUN_KEY),
-        files=files,
-        data={"from": MAILGUN_FROM,
-              "to": MAILGUN_TO,
-              "subject": "Daily Status Report",
-              "text": "Daily snapshot of the Refugees United dashboard.",
-              "html": ''.join(html),
-              })
+                        POST_URL,
+                        auth=('api', MAILGUN_KEY),
+                            files=files,
+                            data={"from": MAILGUN_FROM, 
+                                "to": MAILGUN_TO,
+                                "subject": "Daily Status Report",
+                                "text": "Daily snapshot of the Refugees United dashboard.",
+                                "html": template.render(context=context),
+                                })
 
 if __name__ == '__main__':
 
