@@ -13,13 +13,14 @@ import sys
 import os
 import requests
 import json
+import logging
 from werkzeug import MultiDict as MultiDict
 from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO
 from config import IMAGEDIR
 from jinja2 import Environment, PackageLoader
 
-DEBUG = False
 POST_URL = 'https://api.mailgun.net/v2/refugeesunited.mailgun.org/messages'
+logging.basicConfig(level=logging.INFO)
 
 def send_email(datafile):
   
@@ -87,4 +88,4 @@ if __name__ == '__main__':
     datafile = sys.argv[1]
 
     r = send_email(datafile)
-    print r.text
+    logging.info(r.text)

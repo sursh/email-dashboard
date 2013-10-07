@@ -10,9 +10,7 @@ import logging
 from datetime import datetime
 from config import IMAGEDIR
 
-DEBUG = False
 BINS = 10
-
 logging.basicConfig(level=logging.INFO)
 
 def generate_graphs(datafile):
@@ -29,7 +27,7 @@ def generate_graphs(datafile):
 
         for graph in wholefile:
 
-            logging.info("Graphing %s." % graph['uniquename'])
+            logging.debug("Graphing %s." % graph['uniquename'])
 
             if graph['type'] == 'bar' and graph['data']:
 
@@ -78,7 +76,7 @@ def generate_graphs(datafile):
                 fig.set_size_inches(6,4.5)
                 filename = graph['uniquename'] + '.png'
                 plt.savefig(filename, dpi=80)
-                if DEBUG: print "SUCCESS! Created file %s" % filename
+                logging.info("Created file %s" % filename)
 
                 plt.clf()
 
@@ -100,15 +98,15 @@ def generate_graphs(datafile):
                 fig.set_size_inches(6,4.5)
                 filename = graph['uniquename'] + '.png'
                 plt.savefig(filename, dpi=80)
-                if DEBUG: print "SUCCESS! Created file %s" % filename
+                logging.info("Created file %s" % filename)
 
                 plt.clf()
 
             else:
-                if DEBUG:
-                    print 'Did NOT create graph for "%s" (type: %s)' % (graph['uniquename'], graph['type'])
-                    if not graph['data']: print '\tbecause it didn\'t contain any data'
-                    else: print '\t because it\'s not a supported graph type'
+                message = 'Did NOT create graph for "%s" (type: %s) ' % (graph['uniquename'], graph['type'])
+                if not graph['data']: message += 'because it didn\'t contain any data'
+                else: message += 'because it\'s not a supported graph type'
+                logging.error(message)
 
 if __name__ == '__main__':
 
