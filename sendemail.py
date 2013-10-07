@@ -15,11 +15,10 @@ import requests
 import json
 import logging
 from werkzeug import MultiDict as MultiDict
-from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO
+from config_mailgun import MAILGUN_KEY, MAILGUN_FROM, MAILGUN_TO, POST_URL, SUBJECT
 from config import IMAGEDIR
 from jinja2 import Environment, PackageLoader
 
-POST_URL = 'https://api.mailgun.net/v2/refugeesunited.mailgun.org/messages'
 logging.basicConfig(level=logging.INFO)
 
 def send_email(datafile):
@@ -74,8 +73,8 @@ def send_email(datafile):
                             files=files,
                             data={"from": MAILGUN_FROM, 
                                 "to": MAILGUN_TO,
-                                "subject": "Daily Status Report",
-                                "text": "Daily snapshot of the Refugees United dashboard.",
+                                "subject": SUBJECT,
+                                "text": "Analytics by email.",
                                 "html": template.render(context=context),
                                 })
 
